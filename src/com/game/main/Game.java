@@ -32,6 +32,10 @@ public class Game extends Canvas implements Serializable, Runnable {
         handler.addObject(new Player(WIDTH/2-32, HEIGHT/2-32,ID.Player,handler));
 
 
+        handler.addObject(new BasicEnemy(random.nextInt(Game.WIDTH), random.nextInt(Game.HEIGHT), ID.BasicEnemy, handler));
+
+
+
     }
 
     public synchronized void start() {

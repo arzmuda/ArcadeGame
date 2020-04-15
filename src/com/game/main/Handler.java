@@ -20,6 +20,18 @@ public class Handler {
 
         }
     }
+
+    public void clearEnemies(){          //This method delete all enemies on screen
+        for(int i = 0; i < object.size(); i++){
+            GameObject tempObject = object.get(i);
+
+            if(tempObject.getId() != ID.Player){
+                removeObject(tempObject);
+                i--;
+            }
+        }
+    }
+
     public void addObject(GameObject object){
         this.object.add(object);
     }
