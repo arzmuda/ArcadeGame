@@ -17,11 +17,22 @@ public class Game extends Canvas implements Serializable, Runnable {
     private Handler handler;
     private HUD hud;
     private Spawn spawner;
+    private Menu menu;
+
+    public enum STATE {
+        Menu,
+        Help,
+        Game
+    };
+
+    public STATE gameState = STATE.Menu;
 
     public Game(){
         handler = new Handler();
+        menu = new Menu(this, handler);
 
         this.addKeyListener(new KeyInput(handler));
+        this.addMouseListener(menu);
 
 
         new Window(WIDTH, HEIGHT, "GAME", this);
@@ -29,12 +40,12 @@ public class Game extends Canvas implements Serializable, Runnable {
         spawner = new Spawn(handler,hud);
         random = new Random();
 
-        handler.addObject(new Player(WIDTH/2-32, HEIGHT/2-32,ID.Player,handler));
+        if(gameState ==  STATE.Game) {
 
+            handler.addObject(new Player(WIDTH / 2 - 32, HEIGHT / 2 - 32, ID.Player, handler));
+            handler.addObject(new BasicEnemy(random.nextInt(Game.WIDTH), random.nextInt(Game.HEIGHT), ID.BasicEnemy, handler));
 
-        handler.addObject(new BasicEnemy(random.nextInt(Game.WIDTH), random.nextInt(Game.HEIGHT), ID.BasicEnemy, handler));
-
-
+        }
 
     }
 
@@ -88,8 +99,13 @@ public class Game extends Canvas implements Serializable, Runnable {
 
     private void tick(){
         handler.tick();
-        hud.tick();
-        spawner.tick();
+        if(gameState == STATE.Game){
+            hud.tick();
+            spawner.tick();
+        }else if(gameState == STATE.Menu){
+            menu.tick();
+        }
+
     }
 
     private void render(){
@@ -104,8 +120,14 @@ public class Game extends Canvas implements Serializable, Runnable {
         graphics.fillRect(0,0,WIDTH,HEIGHT);
 
         handler.render(graphics);
+        if(gameState == STATE.Game)
+        {
+            hud.render(graphics);
+        }else if(gameState == STATE.Menu || gameState == STATE.Help){
+            menu.render(graphics);
+        }
 
-        hud.render(graphics);
+
 
         graphics.dispose();
         bufferStrategy.show();
