@@ -12,8 +12,8 @@ public class BossMinion extends GameObject {
         super(x, y, id);
         this.handler = handler;
 
-        velX = (random.nextInt(5 - -5)+ -5);
-        velY = 3;
+        velX = (random.nextInt(6 - -6)+ -6);
+        velY = 6;
     }
     public Rectangle getBounds() {
         return new Rectangle((int)x, (int)y, 16, 16);

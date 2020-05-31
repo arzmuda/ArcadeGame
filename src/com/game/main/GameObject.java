@@ -7,6 +7,9 @@ public abstract class GameObject {
     protected float x, y;
     protected ID id;
     protected float velX, velY;
+    public GameObject(){
+
+    }
 
     public GameObject(float x, float y, ID id){
         this.x = x;

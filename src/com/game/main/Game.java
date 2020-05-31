@@ -13,31 +13,42 @@ public class Game extends Canvas implements Serializable, Runnable {
     private Thread thread;
     private boolean running = false;
 
+    public static boolean paused = false;
+    public int difficult = 0;
+    // 0 - normal
+    // 1 - hard
+
     private Random random;
     private Handler handler;
     private HUD hud;
     private Spawn spawner;
     private Menu menu;
+    private Shop shop;
 
     public enum STATE {
         Menu,
         Help,
-        Game
+        Game,
+        SelectDifficulty,
+        Shop,
+        End
     };
 
     public STATE gameState = STATE.Menu;
 
     public Game(){
         handler = new Handler();
-        menu = new Menu(this, handler);
+        hud = new HUD();
+        shop = new Shop(handler, hud);
+        menu = new Menu(this, handler, hud);
 
-        this.addKeyListener(new KeyInput(handler));
+        this.addKeyListener(new KeyInput(handler, this));
         this.addMouseListener(menu);
+        this.addMouseListener(shop);
 
 
         new Window(WIDTH, HEIGHT, "GAME", this);
-        hud = new HUD();
-        spawner = new Spawn(handler,hud);
+        spawner = new Spawn(handler,hud, this);
         random = new Random();
 
         if(gameState ==  STATE.Game) {
@@ -45,6 +56,10 @@ public class Game extends Canvas implements Serializable, Runnable {
             handler.addObject(new Player(WIDTH / 2 - 32, HEIGHT / 2 - 32, ID.Player, handler));
             handler.addObject(new BasicEnemy(random.nextInt(Game.WIDTH), random.nextInt(Game.HEIGHT), ID.BasicEnemy, handler));
 
+        }else{
+            for(int i = 0; i < 15; i++){
+                handler.addObject(new MenuParticle(random.nextInt(WIDTH), random.nextInt(HEIGHT), ID.MenuParticle, handler));
+            }
         }
 
     }
@@ -98,12 +113,26 @@ public class Game extends Canvas implements Serializable, Runnable {
     }
 
     private void tick(){
-        handler.tick();
         if(gameState == STATE.Game){
-            hud.tick();
-            spawner.tick();
-        }else if(gameState == STATE.Menu){
+            if(!paused) {
+                hud.tick();
+                spawner.tick();
+                handler.tick();
+                if (HUD.HEALTH <= 0) {
+                    HUD.HEALTH = 100;
+                    shop.setBox1(300);
+                    shop.setBox2(200);
+                    shop.setBox3(500);
+                    handler.object.clear();
+                    gameState = STATE.End;
+                    for (int i = 0; i < 15; i++) {
+                        handler.addObject(new MenuParticle(random.nextInt(WIDTH), random.nextInt(HEIGHT), ID.MenuParticle, handler));
+                    }
+                }
+            }
+        }else if(gameState == STATE.Menu || gameState == STATE.End || gameState == STATE.SelectDifficulty){
             menu.tick();
+            handler.tick();
         }
 
     }
@@ -119,11 +148,21 @@ public class Game extends Canvas implements Serializable, Runnable {
         graphics.setColor(Color.BLACK);
         graphics.fillRect(0,0,WIDTH,HEIGHT);
 
-        handler.render(graphics);
+
+
+        if(paused){
+            graphics.setColor(Color.WHITE);
+            graphics.drawString("PAUSED", 200, 100);
+        }
+
         if(gameState == STATE.Game)
         {
             hud.render(graphics);
-        }else if(gameState == STATE.Menu || gameState == STATE.Help){
+            handler.render(graphics);
+        }else if(gameState == STATE.Shop){
+                shop.render(graphics);
+        }else if(gameState == STATE.Menu || gameState == STATE.Help || gameState == STATE.End || gameState == STATE.SelectDifficulty){
+            handler.render(graphics);
             menu.render(graphics);
         }
 

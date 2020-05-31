@@ -24,6 +24,9 @@ public class Player extends GameObject {
         x = Game.clamp(x, 0,Game.WIDTH - 32);
         y = Game.clamp(y, 0, Game.HEIGHT - 62);
 
+        handler.addObject(new Trail((int)x, (int)y,ID.Trail, Color.WHITE, 32, 32, 0.03f, handler));
+
+
         collision();
 
 
@@ -33,13 +36,20 @@ public class Player extends GameObject {
         for (int i = 0; i < handler.object.size(); i++) {
 
             GameObject tempObject = handler.object.get(i);
-            if (tempObject.getId() == ID.BasicEnemy || tempObject.getId() == ID.FastEnemy || tempObject.getId() == ID.SmartEnemy || tempObject.getId() == ID.BossMinion) {
+            if (tempObject.getId() == ID.BasicEnemy || tempObject.getId() == ID.FastEnemy || tempObject.getId() == ID.SmartEnemy
+                    || tempObject.getId() == ID.BossMinion)   {
                 if(getBounds().intersects(tempObject.getBounds()))
                      HUD.HEALTH -= 2;
 
+            }else if(tempObject.getId() == ID.HardBasicEnemy || tempObject.getId() == ID.HardFastEnemy ||
+                    tempObject.getId() == ID.HardSmartEnemy){
+                if(getBounds().intersects(tempObject.getBounds()))
+                    HUD.HEALTH -= 3;
+
+
              }else if(tempObject.getId() == ID.Boss){
                 if(getBounds().intersects(tempObject.getBounds()))
-                HUD.HEALTH = 1;
+                HUD.HEALTH = 0;
 
             }
         }

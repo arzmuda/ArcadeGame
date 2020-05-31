@@ -41,7 +41,7 @@ public class Boss extends GameObject {
 
 
 
-            int spawn = random.nextInt(10);
+            int spawn = random.nextInt(5);
             if(spawn == 0) handler.addObject(new BossMinion((int)x + 48, (int)y + 48,ID.BossMinion,handler));
         }
 
